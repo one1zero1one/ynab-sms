@@ -32,7 +32,7 @@ def sendSMS(number, message):
 	log.msg("SMS message", to=number, from_=settings['twilio']['number'], body=message)
 
 def sendSlack(message):
-	sc.api_call("chat.postMessage", channel=settings['slack']['channel'], text=message)
+	sc.api_call("chat.postMessage", username='ynab-sms', icon_emoji=':money_with_wings:', channel=settings['slack']['channel'], text=message)
 	log.msg("Slack message", channel=settings['slack']['channel'], text=message)
 
 def processTransaction(id, doc, balance, knownTransactions):
