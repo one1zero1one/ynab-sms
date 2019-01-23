@@ -15,7 +15,7 @@ try:
 		settings = json.load(f)
 		log.msg("Loading config on startup", file=f)
 except:
-	log.Error("Error loading settings. Verify that settings.json exists and contains valid json!", file=f)
+	log.Error("Error loading settings. Verify that settings.json exists and contains valid json!")
 	exit(-1)
 
 # Fill flags from config
@@ -59,7 +59,7 @@ def job():
 			log.msg("Loading known transactions", file=f)
 	except:
 		knownTransactions = []
-		log.msg("No known transactions", file=f)
+		log.msg("No known transactions")
 
 	# Load previous budget amounts
 	try:
@@ -68,7 +68,7 @@ def job():
 			log.msg("Loading previous bugeted amounts", file=f)
 	except:
 		budgetedAmounts = {}
-		log.msg("No previous bugeted amounts", file=f)
+		log.msg("No previous bugeted amounts")
 
 	# Grab the current data from the YNAB API
 	headers = {
