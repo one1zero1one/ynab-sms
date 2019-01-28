@@ -15,7 +15,7 @@ try:
 		settings = json.load(f)
 		log.msg("Loading config on startup", file=f)
 except:
-	log.Error("Error loading settings. Verify that settings.json exists and contains valid json!")
+	log.err("Error loading settings. Verify that settings.json exists and contains valid json!")
 	exit(-1)
 
 # Fill flags from config
@@ -35,23 +35,28 @@ def sendSlack(message):
 	sc.api_call("chat.postMessage", username='ynab-sms', icon_emoji=':money_with_wings:', channel=settings['slack']['channel'], text=message)
 	log.msg("Slack message", channel=settings['slack']['channel'], text=message)
 
-def processTransaction(id, doc, balance, knownTransactions):
+def processTransaction(id, doc, balance, knownTransactions, init):
 	if id not in knownTransactions:
 		knownTransactions.append(id)
-		if doc['flag'] in flags and doc['outflow'] > 0:
+		# send sms message to the _other_ users
+		if doc['flag'] in flags and doc['outflow'] > 0 and ( init == 0 ):
 			#SMS
 			if 'twilio' in settings['notify']:			
 				for user in settings['users']:
 					if user['flag'] not in doc['flag']:
 						text = flags[doc['flag']] + ' spent ' + settings['coin'] + '{:01.2f}'.format(doc['outflow']) + ' @ ' + doc['payee'] + ' from ' + doc['category'] + ' in account ' + doc['account'] + '. '  + settings['coin'] + '{:01.2f}'.format(balance) + ' remaining. (' + doc['memo'] + ')'
 						sendSMS(user['number'], text)
-			#Slack
-			if 'slack' in settings['notify']:
-				text = flags[doc['flag']] + ' spent ' + settings['coin'] + '{:01.2f}'.format(doc['outflow']) + ' @ ' + doc['payee'] + ' from ' + doc['category'] + ' in account ' + doc['account'] + '. ' + settings['coin'] + '{:01.2f}'.format(balance) + ' remaining. (' + doc['memo'] + ')'
-				sendSlack(text)
+		# send message to slack channel
+		if doc['outflow'] > 0 and ( init == 0 ) and 'slack' in settings['notify']:		
+			text = flags[doc['flag']] + ' spent ' + settings['coin'] + '{:01.2f}'.format(doc['outflow']) + ' @ ' + doc['payee'] + ' from ' + doc['category'] + ' in account ' + doc['account'] + '. ' + settings['coin'] + '{:01.2f}'.format(balance) + ' remaining. (' + doc['memo'] + ')'
+			sendSlack(text)
 
 def job():
 	log.msg("Starting job")
+	
+	init = 0
+	docs = []
+
 	# Load previous transactions
 	try:
 		with open('known-transactions.json', 'r') as f:
@@ -59,6 +64,7 @@ def job():
 			log.msg("Loading known transactions", file=f)
 	except:
 		knownTransactions = []
+		init = 1
 		log.msg("No known transactions")
 
 	# Load previous budget amounts
@@ -68,6 +74,7 @@ def job():
 			log.msg("Loading previous bugeted amounts", file=f)
 	except:
 		budgetedAmounts = {}
+		init = 1
 		log.msg("No previous bugeted amounts")
 
 	# Grab the current data from the YNAB API
@@ -172,7 +179,7 @@ def job():
 					doc['category'] = categories[t['category_id']]['name']
 					doc['group'] = categories[t['category_id']]['group']
 					catBalance = categories[t['category_id']]['balance']            
-				processTransaction(id, doc, catBalance, knownTransactions)
+				processTransaction(id, doc, catBalance, knownTransactions, init)
 		else:
 			id = t['id']
 			doc = {}
@@ -201,7 +208,12 @@ def job():
 				doc['category'] = categories[t['category_id']]['name']
 				doc['group'] = categories[t['category_id']]['group']
 				catBalance = categories[t['category_id']]['balance']
-			processTransaction(id, doc, catBalance, knownTransactions)
+			processTransaction(id, doc, catBalance, knownTransactions, init)
+		docs.append(doc)
+
+	with open('known-docs.json', 'w') as f:
+		json.dump(docs, f, indent=4, sort_keys=True, ensure_ascii = True)
+		log.msg("Saving docs", file=f)
 
 	with open('known-transactions.json', 'w') as f:
 		json.dump(knownTransactions, f, indent=4, sort_keys=True, ensure_ascii = False)
