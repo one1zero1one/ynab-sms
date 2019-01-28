@@ -211,9 +211,9 @@ def job():
 			processTransaction(id, doc, catBalance, knownTransactions, init)
 		docs.append(doc)
 
-	with open('known-docs.json', 'w') as f:
-		json.dump(docs, f, indent=4, sort_keys=True, ensure_ascii = True)
-		log.msg("Saving docs", file=f)
+	# with open('known-docs.json', 'w') as f:
+	# 	json.dump(docs, f, indent=4, sort_keys=True, ensure_ascii = True)
+	# 	log.msg("Saving docs", file=f)
 
 	with open('known-transactions.json', 'w') as f:
 		json.dump(knownTransactions, f, indent=4, sort_keys=True, ensure_ascii = False)
