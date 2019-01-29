@@ -1,6 +1,6 @@
 # Intro
 
-Do you use YNAB with mutliple people? use `ynab-sms.py` to send text or messages to other users of your budget (or/and to a slack channel) to keep everyone in the loop! The script uses flag colors to identify who's transaction it is. For instance, I mark my transactions with a blue flag, and my wife marks hers with a purple flag. The script will also alert all users if a category's budgeted amount gets changed.
+Do you use YNAB with mutliple people? use `ynab-sms.py` to notify other users of your budget (or/and to a slack channel) to keep everyone in the loop! The script uses flag colors to identify who's transaction it is. For instance, I mark my transactions with a blue flag, and my wife marks hers with a purple flag. The script will also alert all users if a category's budgeted amount gets changed.
 
 ## Getting started
 
@@ -64,7 +64,7 @@ In the `slack` section, you'll need your API token, and the chanel you want to s
     }
 ```
 
-Finally, in the `users` section add each person you want to get SMS alerts, and the flag color for the transactions they enter.
+Finally, in the `users` section add each person you want to get SMS alerts, and the flag color for the transactions they enter. Transactions with no or unknown flags (not defined here) will not be sent by SMS but will be sent to slack.
 
 ```json
     "users": [
@@ -84,7 +84,7 @@ Finally, in the `users` section add each person you want to get SMS alerts, and 
 
 ## Run as a script
 
-Once configured, run `python3 ynab-sms.py`. The script writes a couple json files to the local directory to keep track of past data, so make sure it has write permissions.
+Once configured, run `python3 ynab-sms.py`. It will automatically run the job. The script writes a couple json files to the local directory to keep track of past data, so make sure it has write permissions. The script will notify only about _new_ transactions.
 
 ## Run in docker
 
