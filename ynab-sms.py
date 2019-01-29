@@ -47,8 +47,12 @@ def processTransaction(id, doc, balance, knownTransactions, init):
 						text = flags[doc['flag']] + ' spent ' + settings['coin'] + '{:01.2f}'.format(doc['outflow']) + ' @ ' + doc['payee'] + ' from ' + doc['category'] + ' in account ' + doc['account'] + '. '  + settings['coin'] + '{:01.2f}'.format(balance) + ' remaining. (' + doc['memo'] + ')'
 						sendSMS(user['number'], text)
 		# send message to slack channel
-		if doc['outflow'] > 0 and ( init == 0 ) and 'slack' in settings['notify']:		
-			text = flags[doc['flag']] + ' spent ' + settings['coin'] + '{:01.2f}'.format(doc['outflow']) + ' @ ' + doc['payee'] + ' from ' + doc['category'] + ' in account ' + doc['account'] + '. ' + settings['coin'] + '{:01.2f}'.format(balance) + ' remaining. (' + doc['memo'] + ')'
+		if doc['outflow'] > 0 and ( init == 0 ) and 'slack' in settings['notify']:
+			if doc['flag'] in flags:
+				who = flags[doc['flag']]
+			else:
+				who = "Someone"
+			text = who + ' spent ' + settings['coin'] + '{:01.2f}'.format(doc['outflow']) + ' @ ' + doc['payee'] + ' from ' + doc['category'] + ' in account ' + doc['account'] + '. ' + settings['coin'] + '{:01.2f}'.format(balance) + ' remaining. (' + doc['memo'] + ')'
 			sendSlack(text)
 
 def job():
