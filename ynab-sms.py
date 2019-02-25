@@ -52,7 +52,7 @@ def processTransaction(id, doc, balance, knownTransactions, init):
 				who = flags[doc['flag']]
 			else:
 				who = "Someone"
-			text = who + ' spent ' + settings['coin'] + '{:01.2f}'.format(doc['outflow']) + ' @ ' + doc['payee'] + ' from ' + doc['category'] + ' in account ' + doc['account'] + '. ' + settings['coin'] + '{:01.2f}'.format(balance) + ' remaining. (' + doc['memo'] + ')'
+			text = who + ' spent ' + settings['coin'] + '{:01.2f}'.format(doc['outflow']) + ' @ ' + doc['payee'] + ' from ' + str(doc['category']) + ' in account ' + doc['account'] + '. ' + settings['coin'] + '{:01.2f}'.format(balance) + ' remaining. (' + doc['memo'] + ')'
 			sendSlack(text)
 
 def job():
