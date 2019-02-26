@@ -88,7 +88,7 @@ Once configured, run `python3 ynab-sms.py`. It will automatically run the job. T
 
 ## Run in docker
 
-Build with `docker build --tag ynab-sms .` and run with `docker run ynab-sms`.
+Build with `docker build --tag ynab-sms .` and run with `docker run -d --restart unless-stopped ynab-sms:latest`.
 
 ## Improvements
 
